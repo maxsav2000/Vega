@@ -1,0 +1,223 @@
+\documentclass[]{beamer}
+\usepackage[scale=1.15]{beamerposter} % use scale from 1.1 to 1.2
+
+\usepackage{beamerposter}
+
+\usetheme{vegaposter} 
+
+
+\addbibresource{refs.bib}
+\usepackage{lipsum}
+
+\title{Задача отимального расположения средств по пулам ликвидности}
+\author{Максим Савинов}
+\supervisor{Ростислав Березовский, Артур Сидоренко}
+\researchgroup{Optimal control in decentralized finance}
+
+\begin{document}
+\nocite{*} % This is needed to make sure that all references are included in the bibliography
+
+\begin{frame}[t]
+    \begin{columns}[t] % The whole poster consists of three major columns, the second of which is split into two columns twice - the [t] option aligns each column's content to the top
+     
+    \begin{column}{\sepwid}\end{column} % Empty spacer column
+    
+    \begin{column}{\onecolwid} % The first column
+     
+    %----------------------------------------------------------------------------------------
+    %	INTRODUCTION
+    %----------------------------------------------------------------------------------------
+    
+    \begin{block}{Introduction}
+    
+        Рассматривается задача оптимального расположения средств по пулам ликвидности, необходимо динамически распределять капитал по нескольким пулам ликвидности в AMMы с constant-product функциями цены, которые удовлетворяет условиям описанных в \cite{Engel2021}.
+        При этом распределении необходимо добится максимальной доходности при фиксированном риске или минимального риска при фиксированной доходности, а так же иследовать стратегии для других функционалов полезности. 
+    
+    \end{block}
+    
+    %----------------------------------------------------------------------------------------
+    %	OBJECTIVES
+    %----------------------------------------------------------------------------------------
+    
+    \begin{alertblock}{Objectives}
+    
+    \begin{itemize}
+    \item Аксиоматически определить композицию AMM пулов для поставщика ликвидности
+    \item Сформулировать задачу оптимального распределения активов
+    \item Поиск стратегий динамического перекладывания активов
+    \end{itemize}
+    
+    \end{alertblock}
+    
+    %------------------------------------------------
+    \begin{block}{Problem statement}
+    Пусть есть пулы со всеми попарными комбинациями и матрица ковариаций их цен $ \Sigma(t)$, пусть $A(t)$ матрица коффициентов вложений в каждую пару пулов, 
+    $\eta_{i,j}(\Sigma(t), t)$, скорость начисления коммисий за предоставление ликвидности, цены моделируются геометрическим броуновским движением.
+    Необходимо найти такую стратегию $A(t)$, чтобы максимизировать доходность состоящую из потери связанной с изменением цен и начислений коммисий.
+
+    \end{block}
+    
+    %----------------------------------------------------------------------------------------
+    
+    \end{column} % End of the first column
+    
+    \begin{column}{\sepwid}\end{column} % Empty spacer column
+    
+    \begin{column}{\twocolwid} % Begin a column which is two columns wide (column 2)
+    
+    \begin{columns}[t,totalwidth=\twocolwid] % Split up the two columns wide column
+    
+    \begin{column}{\onecolwid}\vspace{-.6in} % The first column within column 2 (column 2.1)
+    
+    %----------------------------------------------------------------------------------------
+    %	MATERIALS
+    %----------------------------------------------------------------------------------------
+    
+    \begin{block}{Example}
+        В пуле $X$ лежит пара ETH/BTC $xy = L^2, $ в пуле $Y$ лежит пара BTC/stable coin $ yz = K^2.$
+        Обозначим за $p = \frac{y}{x}$ цену ETH в BTC, а $q = \frac{z}{y}$ цену ВTC в stable coin. Вычислим impermanent loss при переходе с момента времени $t_0 = 0,$ в $t_1 = 1.$
+        Выразим $x, y, z$ через $p, q$, используя constant-product соотношения, определения $p, q$:
+        $$ y = L \sqrt{p}, \ x = \frac{L}{\sqrt{p}}, \  y = \frac{K} {\sqrt{q}}, \ z = K \sqrt{q}. $$
+        $$ \text{ILOSS}(a, b, \alpha) = \frac{v_1 - v_{hold}}{v_{hold}} = \frac{v_1}{v_{hold}} - 1, $$
+        $$\text{ILOSS}(a, b, \alpha) = \frac{\alpha \sqrt{a}b + (2- \alpha)\sqrt{b}}{\alpha ab + b + 1 - \alpha} - 1$$ 
+        
+    \end{block}
+
+
+    
+    
+    %----------------------------------------------------------------------------------------
+    
+    \end{column} % End of column 2.1
+    
+    \begin{column}{\onecolwid}\vspace{-.6in} % The second column within column 2 (column 2.2)
+    
+    %----------------------------------------------------------------------------------------
+    %	METHODS
+    %----------------------------------------------------------------------------------------
+    
+    \begin{block}{Mathematical Section}
+    
+        Будем решать задачу в непрерывном времени. Пусть цена перекладывания любого количества актива из одного пула в другой пул равна $c$. Оплата за пользование ликвидностью описываются процессом $\eta(\Sigma, t),$ явную формулу можно найти в \cite{Guillermo2021}.
+        $$ dS_i(t) = \mu(S_i, t)dt + \Sigma S_i dW_{t,i}.$$
+        необходимо найти такой процесс $u(t) \in [t_0, T] \times \mathcal{A},$ который минимизирует величину
+        $$ \mathbb{E} \sum_{i = 1}^{n} \sum_{j = 1}^{n} \biggl[ a_{i,j}(T) \text{LVS}_{i,j}( \frac{S_{i}(T)} {S_{j}(T)}) - \int_{t_0}^{T}\eta_{ij}(a_{i,j}(s), \Sigma_{ij}(s))ds \biggr],$$
+        где минимиум берется по процессам $u(t)$ таких, что в любой момент времени $t$, $u(t)$ стохастическая матрица. 
+    \end{block}
+
+
+    
+    %----------------------------------------------------------------------------------------
+    
+    \end{column} % End of column 2.2
+    
+    \end{columns} % End of the split of column 2 - any content after this will now take up 2 columns width
+    
+    %----------------------------------------------------------------------------------------
+    %	IMPORTANT RESULT
+    %----------------------------------------------------------------------------------------
+    
+    \begin{alertblock}{Optimal strategy}
+        В простейшей постановке наши перекладывания не влияют на цены активов, поэтому оптимальная стратегия состоит в том, чтобы в каждый момент времени максимизировать доход от коммисии, а потом выйти с позиции, когда цены станут близки к начальным.
+    \end{alertblock} 
+    
+    %----------------------------------------------------------------------------------------
+    
+    \begin{columns}[t,totalwidth=\twocolwid] % Split up the two columns wide column again
+    
+    \begin{column}{\onecolwid} % The first column within column 2 (column 2.1)
+    
+    %----------------------------------------------------------------------------------------
+    %	MATHEMATICAL SECTION
+    %----------------------------------------------------------------------------------------
+    
+    \begin{block}{Example}
+    
+        \begin{figure}
+        \includegraphics[width=0.8\linewidth]{4.png}
+        \caption{Impermanent loss}
+        \end{figure}
+        
+        График потери капитала из-за изменения цен активов.
+       
+        
+    \end{block}
+
+
+    
+
+    
+    %----------------------------------------------------------------------------------------
+    
+    \end{column} % End of column 2.1
+    
+    \begin{column}{\onecolwid} % The second column within column 2 (column 2.2)
+    
+    %----------------------------------------------------------------------------------------
+    %	RESULTS
+    %----------------------------------------------------------------------------------------
+    
+    \begin{block}{Methods}
+        
+        Будем использовать стохастический принцип максимума для поиска оптимального контроля.
+        Гамильтониан записывается как:
+        $$ \mathcal{H}(\cdot) = -\eta(\Sigma, s) + \mu(S_i, t) p(\cdot) + \Sigma S_i q(\cdot) =  $$
+        $$ = -\sum_{i = 1}^{n} \sum_{j = 1}^{n} \eta_{ij}(a_{i,j}(s), \Sigma_{ij}(s)) + \mu(S_i, t) p(\cdot) + \Sigma S_i q(\cdot),  $$
+        Сопряженная система:
+        $$
+      \begin{cases}
+        dp  = -\frac{d\mathcal{H}}{dS}(t)dt + qdW_t;\\
+        p(T) = \lambda(T) h'(S(T)); \\
+      \end{cases}
+      $$
+        
+        \end{block}
+    %----------------------------------------------------------------------------------------
+    
+    \end{column} % End of column 2.2
+    
+    \end{columns} % End of the split of column 2
+    
+    \end{column} % End of the second column
+    
+    \begin{column}{\sepwid}\end{column} % Empty spacer column
+    
+    \begin{column}{\onecolwid} % The third column
+    
+    %----------------------------------------------------------------------------------------
+    %	CONCLUSION
+    %----------------------------------------------------------------------------------------
+    
+    \begin{block}{Conclusion}
+    В работе были предложены способы моделирования пуллов ликвидности и поиск оптимальных стратегий поведения.
+
+    Рассмотрены модели 
+    \begin{itemize}
+    \item Дискретная задача распределения активов
+    \item Неприрываная задача с фиксированным правым концом времени
+    \item Неприрываная задача со свободным правым концом времени
+    \item Случай моделирования различных активов разными стохастическими процессами
+    \end{itemize}
+    
+    В дальнейшем планируется рассматривать более общую задачу с влиянием на цены (поставщик ликвидности владелец большого капитала).
+    \end{block}
+    
+    %----------------------------------------------------------------------------------------
+    %	REFERENCES
+    %----------------------------------------------------------------------------------------
+    
+    \begin{block}{References}
+    
+%    \nocite{*} % Insert publications even if they are not cited in the poster
+    \printbibliography \vspace{0.75in}
+    
+    \end{block}
+    
+    \end{column} % End of the third column
+    
+    \begin{column}{\sepwid}\end{column} % Empty spacer column
+    
+    \end{columns} % End of all the columns in the poster
+        
+    \end{frame} % End of the enclosing frame
+\end{document}
